@@ -19,8 +19,7 @@ class DualQuaternion:
     
     @staticmethod
     def from_vector(vector):
-        x, y, z = vector
-        return DualQuaternion.from_components([1, 0, 0, 0], [0, x, y, z])
+        return DualQuaternion.from_components([1, 0, 0, 0], [0, vector.x, vector.y, vector.z])
     
     @staticmethod
     def difference(q1, q2):
@@ -76,7 +75,7 @@ class DualQuaternion:
         result = DualQuaternion.product(qp, self.get_conjugate())
         
         # Extract new point p' from 1 + ɛp'
-        return result.q_dual.get_as_vector()
+        return result.q_dual.as_vector()
 
 
     def __str__(self):
@@ -94,8 +93,7 @@ class Quaternion:
 
     @staticmethod
     def from_vector(vector):
-        x, y, z = vector
-        return Quaternion([0, x, y, z])
+        return Quaternion([0, vector.x, vector.y, vector.z])
 
     @staticmethod
     def create_rotation(rotation_axis_vector, theta):
@@ -143,9 +141,45 @@ class Quaternion:
     def get_scaled(self, s):
         return Quaternion([s * self.real, s * self.ci, s * self.cj, s * self.ck])
     
-    def get_as_vector(self):
-        return [self.ci, self.cj, self.ck]
+    def as_vector(self):
+        return Vector(self.ci, self.cj, self.ck)
     
     def __str__(self):
         return f"({self.real}, {self.ci}, {self.cj}, {self.ck})"
+    
+
+class Vector:
+
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+    
+    @staticmethod
+    def distance(p1, p2):
+        return Vector.difference(p1, p2).magnitude()
+    
+    @staticmethod
+    def difference(p1, p2):
+        x = p1.x - p2.x
+        y = p1.y - p2.y
+        z = p1.z - p2.z
+        return Vector(x, y, z)
+    
+    @staticmethod
+    def sum(p1, p2):
+        x = p1.x + p2.x
+        y = p1.y + p2.y
+        z = p1.z + p2.z
+        return Vector(x, y, z)
+    
+    @staticmethod
+    def dot(p1, p2):
+        return (p1.x * p2.x) + (p1.y * p2.y) + (p1.z * p2.z)
+    
+    def magnitude(self):
+        return math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+    
+    def distance_from(self, p_other):
+        return Vector.difference(self, p_other).magnitude()
     
